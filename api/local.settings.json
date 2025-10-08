@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "SQL_CONNECTION_STRING": "Server=localhost,1433;User ID=sa;Password=YourStrong!Passw0rd;Initial Catalog=CollegeBus;TrustServerCertificate=True;",
+    "AzureSignalRConnectionString": "Endpoint=https://yoursignalr.service.signalr.net;AccessKey=yourkey;Version=1.0;"
+  }
+}
+

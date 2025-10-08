@@ -1,0 +1,16 @@
+{
+  "name": "college-bus-booking-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "func start",
+    "build": "echo 'No build step for functions'"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.4.0",
+    "mssql": "^10.0.2"
+  }
+}
+
