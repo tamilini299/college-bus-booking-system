@@ -4,75 +4,39 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-
-env:
-  AZURE_WEBAPP_NAME: cbbs-node-tamilini       # your Azure Web App name
-  NODE_VERSION: '22.x'                        # Node version
-  BACKEND_PATH: 'api'
-  FRONTEND_PATH: 'frontend'
-  BUILD_OUTPUT: 'frontend/dist'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    name: Build frontend and backend
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '22.x'
 
-      # 1️⃣ Build React app
+      # Install and build frontend
       - name: Install frontend dependencies
-        working-directory: ${{ env.FRONTEND_PATH }}
+        working-directory: ./frontend
         run: npm install
 
-      - name: Build frontend (Vite)
-        working-directory: ${{ env.FRONTEND_PATH }}
+      - name: Build frontend
+        working-directory: ./frontend
         run: npm run build
 
-      # 2️⃣ Install backend dependencies
+      # Install API dependencies
       - name: Install backend dependencies
-        working-directory: ${{ env.BACKEND_PATH }}
+        working-directory: ./api
         run: npm install
 
-      # 3️⃣ Prepare package for deployment
-      - name: Prepare deployment package
-        run: |
-          mkdir deploy
-          cp -r ${{ env.BACKEND_PATH }} deploy/api
-          cp -r ${{ env.BUILD_OUTPUT }} deploy/frontend
-
-      # 4️⃣ Upload artifact for deployment
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: fullstack-app
-          path: deploy
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    name: Deploy to Azure Web App
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: fullstack-app
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_05910E9D4B2743B39C91900C511AC605 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A16DDEC6A51B411F98F978AF44B440CF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4B29F1AFB16F4B3692870DA4015855E2 }}
-
+      # Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./deploy
+          app-name: cbbs-node-web
+          slot-name: Production
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
