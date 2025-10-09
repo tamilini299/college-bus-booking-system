@@ -10,29 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code from GitHub
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
 
-      # Install and build frontend
+      # -----------------------------
+      # 🔹 FRONTEND BUILD (Vite React)
+      # -----------------------------
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
-      - name: Build frontend
+      - name: Build frontend (Vite)
         working-directory: ./frontend
-        run: npm run build
+        run: |
+          npm install vite --save-dev
+          chmod +x ./node_modules/.bin/vite
+          npx vite build
 
-      # Install API dependencies
+      # -----------------------------
+      # 🔹 BACKEND BUILD (Node API)
+      # -----------------------------
       - name: Install backend dependencies
         working-directory: ./api
-        run: npm install
+        run: npm ci
 
-      # Deploy to Azure Web App
+      # -----------------------------
+      # 🔹 DEPLOY TO AZURE
+      # -----------------------------
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
