@@ -35,13 +35,6 @@ jobs:
           npx vite build
 
       # -----------------------------
-      # 🔹 BACKEND BUILD (Node API)
-      # -----------------------------
-      - name: Install backend dependencies
-        working-directory: ./api
-        run: npm ci
-
-      # -----------------------------
       # 🔹 DEPLOY TO AZURE
       # -----------------------------
       - name: Deploy to Azure Web App
@@ -51,5 +44,3 @@ jobs:
           slot-name: Production
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./frontend/dist
-
-
