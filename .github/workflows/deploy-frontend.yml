@@ -54,7 +54,12 @@ jobs:
     - name: Create deployment package
       run: |
         cd frontend
-        zip -r ../frontend-deploy.zip dist server.js package.json node_modules
+        # Create .deployment file to skip Azure build
+        echo "[config]" > .deployment
+        echo "SCM_DO_BUILD_DURING_DEPLOYMENT=false" >> .deployment
+        
+        # Package everything needed for runtime
+        zip -r ../frontend-deploy.zip dist server.js package.json package-lock.json node_modules .deployment
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
