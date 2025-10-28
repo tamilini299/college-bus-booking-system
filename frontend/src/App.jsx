@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage.jsx';
 import BookingPage from './pages/BookingPage.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import DriverPage from './pages/DriverPage.jsx';
+import Chatbot from './Chatbot.jsx';
 
 function useSession() {
   const [user, setUser] = useState(() => {
@@ -95,6 +96,7 @@ function Layout({ children }) {
               {user?.role === 'driver' && (
                 <Link to="/driver" style={navLinkStyle}>Driver</Link>
               )}
+              <Link to="/chatbot" style={navLinkStyle}>Chatbot</Link>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -219,6 +221,14 @@ export default function App() {
                 <DriverPage />
               </Layout>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chatbot"
+          element={
+            <Layout>
+              <Chatbot />
+            </Layout>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />

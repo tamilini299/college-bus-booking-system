@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # Frontend React App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - cbbs-network
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "7071:7071"
+    environment:
+      - NODE_ENV=production
+      - FUNCTIONS_WORKER_RUNTIME=node
+    volumes:
+      - ./azstorage:/home/site/wwwroot/azstorage
+    networks:
+      - cbbs-network
+    restart: unless-stopped
+
+  # SQL Server Database
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - cbbs-network
+    restart: unless-stopped
+
+  # Azurite Storage Emulator
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "10000:10000"  # Blob service
+      - "10001:10001"  # Queue service
+      - "10002:10002"  # Table service
+    volumes:
+      - azurite_data:/data
+    networks:
+      - cbbs-network
+    restart: unless-stopped
+
+networks:
+  cbbs-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  azurite_data:

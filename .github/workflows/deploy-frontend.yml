@@ -1,0 +1,58 @@
+name: Deploy Frontend to Azure
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install dependencies and build
+      run: |
+        cd frontend
+        npm ci
+        cp src/utils/api.production.js src/utils/api.js
+        sed -i 's/BACKEND_URL_PLACEHOLDER/https:\/\/cbbs-node-web-ecfvdwhjchdchbfp.centralindia-01.azurewebsites.net\/api/g' src/utils/api.js
+        npm run build
+    
+    - name: Create server file
+      run: |
+        cd frontend
+        cat > server.js << 'EOF'
+        const express = require('express');
+        const path = require('path');
+        const app = express();
+        const PORT = process.env.PORT || 8080;
+        app.use(express.static(path.join(__dirname, 'dist')));
+        app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
+        app.listen(PORT, '0.0.0.0', () => console.log('Running on ' + PORT));
+        EOF
+        
+        # Add express to package.json if not present
+        node -e "const pkg=require('./package.json');pkg.dependencies=pkg.dependencies||{};pkg.dependencies.express='^4.18.2';pkg.scripts.start='node server.js';require('fs').writeFileSync('package.json',JSON.stringify(pkg,null,2));"
+        npm install --production
+    
+    - name: Create deployment package
+      run: |
+        cd frontend
+        zip -r ../frontend-deploy.zip dist server.js package.json node_modules
+    
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'cbbs-frontend-3651'
+        publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
+        package: frontend-deploy.zip

@@ -94,7 +94,20 @@ INSERT INTO buses(bus_number, capacity) VALUES
 INSERT INTO schedules(route_id, date, bus_id, departure_time) VALUES
 (1, CONVERT(date, GETDATE()), 1, '08:00'),
 (1, CONVERT(date, GETDATE()), 2, '09:00'),
-(2, CONVERT(date, GETDATE()), 1, '08:30');
+(1, CONVERT(date, GETDATE()), 1, '10:00'),
+(1, CONVERT(date, GETDATE()), 2, '11:00'),
+(1, CONVERT(date, GETDATE()), 1, '14:00'),
+(1, CONVERT(date, GETDATE()), 2, '15:00'),
+(1, CONVERT(date, GETDATE()), 1, '16:00'),
+(1, CONVERT(date, GETDATE()), 2, '17:00'),
+(2, CONVERT(date, GETDATE()), 1, '08:30'),
+(2, CONVERT(date, GETDATE()), 2, '09:30'),
+(2, CONVERT(date, GETDATE()), 1, '10:30'),
+(2, CONVERT(date, GETDATE()), 2, '11:30'),
+(2, CONVERT(date, GETDATE()), 1, '14:30'),
+(2, CONVERT(date, GETDATE()), 2, '15:30'),
+(2, CONVERT(date, GETDATE()), 1, '16:30'),
+(2, CONVERT(date, GETDATE()), 2, '17:30');
 
 -- Sample users for testing
 INSERT INTO users(name, email, role) VALUES

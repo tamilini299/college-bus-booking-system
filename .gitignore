@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*.zip
+
+# Environment files
+.env
+.env.local
+.env.*.local
+local.settings.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Azure
+azstorage/
+backend-logs/
+*.publishsettings
+*publish-profile.xml
+backend-publish-profile.xml
+frontend-publish-profile.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Deployment
+.azure/
+.deployment
+
+# Temporary files
+tmp/
+temp/
+*.tmp

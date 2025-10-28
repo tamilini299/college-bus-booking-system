@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = '/api';
+const baseURL = 'https://cbbs-node-web-ecfvdwhjchdchbfp.centralindia-01.azurewebsites.net/api';
 
 console.log('API Base URL:', baseURL);
 
@@ -39,4 +39,3 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
