@@ -28,38 +28,53 @@ jobs:
         sed -i 's/BACKEND_URL_PLACEHOLDER/https:\/\/cbbs-node-web-ecfvdwhjchdchbfp.centralindia-01.azurewebsites.net\/api/g' src/utils/api.js
         npm run build
     
-    - name: Create server file
+    - name: Create standalone deployment
       run: |
-        cd frontend
-        cat > server.js << 'EOF'
-        import express from 'express';
-        import path from 'path';
-        import { fileURLToPath } from 'url';
+        # Create a fresh deployment directory
+        mkdir -p deploy-temp
         
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
+        # Copy built files
+        cp -r frontend/dist deploy-temp/
         
+        # Create a minimal CommonJS package.json (no "type": "module")
+        cat > deploy-temp/package.json << 'EOF'
+        {
+          "name": "frontend-deploy",
+          "version": "1.0.0",
+          "scripts": {
+            "start": "node server.js"
+          },
+          "dependencies": {
+            "express": "^4.18.2"
+          }
+        }
+        EOF
+        
+        # Create simple CommonJS server
+        cat > deploy-temp/server.js << 'EOF'
+        const express = require('express');
+        const path = require('path');
         const app = express();
         const PORT = process.env.PORT || 8080;
         
         app.use(express.static(path.join(__dirname, 'dist')));
-        app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
-        app.listen(PORT, '0.0.0.0', () => console.log('Running on ' + PORT));
+        app.get('*', (req, res) => {
+          res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+        });
+        
+        app.listen(PORT, '0.0.0.0', () => {
+          console.log('Frontend running on port ' + PORT);
+        });
         EOF
         
-        # Add express to package.json if not present
-        node -e "const pkg=require('./package.json');pkg.dependencies=pkg.dependencies||{};pkg.dependencies.express='^4.18.2';pkg.scripts.start='node server.js';require('fs').writeFileSync('package.json',JSON.stringify(pkg,null,2));"
+        # Install dependencies
+        cd deploy-temp
         npm install --production
     
     - name: Create deployment package
       run: |
-        cd frontend
-        # Create .deployment file to skip Azure build
-        echo "[config]" > .deployment
-        echo "SCM_DO_BUILD_DURING_DEPLOYMENT=false" >> .deployment
-        
-        # Package everything needed for runtime
-        zip -r ../frontend-deploy.zip dist server.js package.json package-lock.json node_modules .deployment
+        cd deploy-temp
+        zip -r ../frontend-deploy.zip .
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
